@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Anniversary | For My Love</title>
+    <style>
+        /* --- CSS STYLES --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle, #2a0a4d, #050112);
+            color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 400px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .screen.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 2.2rem; margin-bottom: 10px; color: #ff4d94; }
+        p { font-size: 1.1rem; opacity: 0.9; }
+
+        .btn {
+            background: #ff4d94;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 148, 0.4);
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn:hover { transform: scale(1.05); background: #ff3385; }
+
+        /* Game Box */
+        #game-area {
+            width: 300px;
+            height: 300px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            position: relative;
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .heart-icon {
+            position: absolute;
+            font-size: 30px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Photo Slider */
+        .photo-container img {
+            width: 100%;
+            border-radius: 15px;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            display: none;
+        }
+
+        .photo-container img.show { display: block; animation: zoomIn 0.5s ease; }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.8); }
+            to { transform: scale(1); }
+        }
+
+        .message-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="loveMusic" loop>
+        <source src="m2.mp3" type="audio/mpeg">
+    </audio>
+
+    <section id="s1" class="screen active">
+        <h1>Hi Puchki🐻</h1>
+        <p>Today is a very special day for us...</p>
+        <button class="btn" onclick="startApp()">Open My Heart ✨</button>
+    </section>
+
+    <section id="s2" class="screen">
+        <p>We've spent</p>
+        <h1 id="dayCounter">0</h1>
+        <p>Beautiful days together ❤️</p>
+        <button class="btn" onclick="showScreen('s3')">See Memories 📸</button>
+    </section>
+
+    <section id="s3" class="screen">
+        <h1>Catch 5 Hearts!</h1>
+        <p>Tap the flying hearts to unlock photos</p>
+        <div id="game-area"></div>
+        <p id="scoreLabel">Hearts: 0/5</p>
+    </section>
+
+    <section id="s4" class="screen">
+        <h1>Our Memories</h1>
+        <div class="photo-container">
+            <img src="f1.jpeg" class="show" id="p1">
+            <img src="f2.jpeg" id="p2">
+            <img src="f3.jpeg" id="p3">
+        </div>
+        <button class="btn" onclick="nextPhoto()">Next Photo ➡️</button>
+    </section>
+
+    <section id="s5" class="screen">
+        <div class="message-card">
+            <h1>Happy Anniversary 💝</h1>
+            <p>You are the best thing that ever happened to me. I love you more than all the lines of code in the world!</p>
+            <p>♾️Forever Yours, <br><strong>Sourav</strong></p>
+        </div>
+    </section>
+
+    <script>
+        /* --- JAVASCRIPT LOGIC --- */
+        let score = 0;
+        let currentPhoto = 1;
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startApp() {
+            document.getElementById('loveMusic').play();
+            showScreen('s2');
+            // Animate Day Counter (Change 210 to your actual total days)
+            animateDays(365); 
+        }
+
+        function animateDays(target) {
+            let count = 0;
+            let timer = setInterval(() => {
+                count += Math.ceil(target / 50);
+                if (count >= target) {
+                    count = target;
+                    clearInterval(timer);
+                }
+                document.getElementById('dayCounter').innerText = count;
+            }, 30);
+            
+            // Start game spawner in background
+            spawnHearts();
+        }
+
+        function spawnHearts() {
+            const area = document.getElementById('game-area');
+            const interval = setInterval(() => {
+                if (score >= 5) {
+                    clearInterval(interval);
+                    setTimeout(() => showScreen('s4'), 800);
+                    return;
+                }
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.className = 'heart-icon';
+                heart.style.left = Math.random() * 250 + 'px';
+                heart.style.top = Math.random() * 250 + 'px';
+                
+                heart.onclick = () => {
+                    score++;
+                    document.getElementById('scoreLabel').innerText = `Hearts: ${score}/5`;
+                    heart.remove();
+                };
+                
+                area.appendChild(heart);
+                setTimeout(() => heart.remove(), 1500);
+            }, 1000);
+        }
+
+        function nextPhoto() {
+            document.getElementById(`p${currentPhoto}`).classList.remove('show');
+            currentPhoto++;
+            if (currentPhoto > 3) {
+                showScreen('s5');
+            } else {
+                document.getElementById(`p${currentPhoto}`).classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
